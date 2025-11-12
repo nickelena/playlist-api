@@ -48,14 +48,27 @@ export function getPlaylistById(req: Request, res: Response, next: NextFunction)
   }
 }
 
-// Create new playlist
+/**
+ * Create a new playlist
+ *
+ * Creates a new playlist with the provided name, description, and privacy setting.
+ * Request body is validated by validateBody middleware using createPlaylistSchema.
+ *
+ * @param req - Express request object with validated body
+ * @param res - Express response object
+ * @param next - Express next function for error handling
+ *
+ * @throws {ApiError} 404 - If the specified user does not exist
+ * @returns 201 - Created playlist object
+ *
+ * @remarks
+ * - Verifies user existence before creating playlist
+ * - Boolean is_public is converted to 0/1 for SQLite compatibility
+ * - Defaults is_public to true if not provided
+ */
 export function createPlaylist(req: Request, res: Response, next: NextFunction) {
   try {
     const { name, description, user_id, is_public }: CreatePlaylist = req.body;
-
-    if (!name || !user_id) {
-      throw new ApiError(400, 'Name and user_id are required');
-    }
 
     // Verify user exists
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(user_id);
@@ -67,7 +80,7 @@ export function createPlaylist(req: Request, res: Response, next: NextFunction) 
       'INSERT INTO playlists (name, description, user_id, is_public) VALUES (?, ?, ?, ?)'
     );
 
-    const result = insert.run(name, description || null, user_id, is_public ?? true);
+    const result = insert.run(name, description || null, user_id, (is_public ?? true) ? 1 : 0);
     const playlistId = result.lastInsertRowid;
 
     const playlist = db.prepare('SELECT * FROM playlists WHERE id = ?').get(playlistId) as Playlist;
@@ -96,7 +109,7 @@ export function updatePlaylist(req: Request, res: Response, next: NextFunction) 
       WHERE id = ?
     `);
 
-    update.run(name, description, is_public, id);
+    update.run(name, description, is_public !== undefined ? (is_public ? 1 : 0) : undefined, id);
 
     const updatedPlaylist = db.prepare('SELECT * FROM playlists WHERE id = ?').get(id) as Playlist;
     res.json(updatedPlaylist);
@@ -127,10 +140,6 @@ export function addSongToPlaylist(req: Request, res: Response, next: NextFunctio
   try {
     const { id } = req.params;
     const { song_id, position } = req.body;
-
-    if (!song_id) {
-      throw new ApiError(400, 'song_id is required');
-    }
 
     const playlist = db.prepare('SELECT * FROM playlists WHERE id = ?').get(id);
     if (!playlist) {
@@ -194,10 +203,6 @@ export function reorderSong(req: Request, res: Response, next: NextFunction) {
   try {
     const { id, songId } = req.params;
     const { new_position } = req.body;
-
-    if (new_position === undefined) {
-      throw new ApiError(400, 'new_position is required');
-    }
 
     const link = db.prepare(
       'SELECT * FROM playlist_songs WHERE playlist_id = ? AND song_id = ?'

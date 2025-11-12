@@ -11,13 +11,22 @@
     "db:init": "tsx --env-file=.env src/db/init.ts",
     "db:seed": "tsx --env-file=.env src/db/seed.ts"
   },
-  "keywords": ["playlist", "music", "api", "rest", "typescript", "express", "sqlite"],
+  "keywords": [
+    "playlist",
+    "music",
+    "api",
+    "rest",
+    "typescript",
+    "express",
+    "sqlite"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "better-sqlite3": "^12.4.1",
     "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

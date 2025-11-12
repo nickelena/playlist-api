@@ -30,14 +30,26 @@ export function getUserById(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-// Create new user
+/**
+ * Create a new user
+ *
+ * Creates a new user with the provided name and email.
+ * Request body is validated by validateBody middleware using createUserSchema.
+ *
+ * @param req - Express request object with validated body
+ * @param res - Express response object
+ * @param next - Express next function for error handling
+ *
+ * @throws {ApiError} 409 - If email already exists
+ * @returns 201 - Created user object
+ *
+ * @remarks
+ * - Email uniqueness is enforced at the application level
+ * - Request body is validated before this controller is called
+ */
 export function createUser(req: Request, res: Response, next: NextFunction) {
   try {
     const { name, email }: CreateUser = req.body;
-
-    if (!name || !email) {
-      throw new ApiError(400, 'Name and email are required');
-    }
 
     // Check if email already exists
     const existingUser = db.prepare('SELECT * FROM users WHERE email = ?').get(email);

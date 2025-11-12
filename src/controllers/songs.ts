@@ -48,18 +48,26 @@ export function getSongById(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-// Create new song
+/**
+ * Create a new song
+ *
+ * Creates a new song with the provided title, duration, and artist associations.
+ * Request body is validated by validateBody middleware using createSongSchema.
+ *
+ * @param req - Express request object with validated body
+ * @param res - Express response object
+ * @param next - Express next function for error handling
+ *
+ * @returns 201 - Created song object
+ *
+ * @remarks
+ * - At least one artist must be provided (enforced by validation)
+ * - Creates song-artist associations in the song_artists junction table
+ * - Album association is optional
+ */
 export function createSong(req: Request, res: Response, next: NextFunction) {
   try {
     const { title, duration, file_url, album_id, artist_ids }: CreateSong = req.body;
-
-    if (!title || !duration) {
-      throw new ApiError(400, 'Title and duration are required');
-    }
-
-    if (!artist_ids || artist_ids.length === 0) {
-      throw new ApiError(400, 'At least one artist is required');
-    }
 
     const insert = db.prepare(
       'INSERT INTO songs (title, duration, file_url, album_id) VALUES (?, ?, ?, ?)'

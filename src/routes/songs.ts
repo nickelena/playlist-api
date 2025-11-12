@@ -8,6 +8,8 @@ import {
   getSongsByArtist,
   getSongsByAlbum,
 } from '../controllers/songs.js';
+import { validateBody } from '../middleware/validate.js';
+import { createSongSchema, updateSongSchema } from '../validation/schemas.js';
 
 const router = Router();
 
@@ -18,10 +20,10 @@ router.get('/', getAllSongs);
 router.get('/:id', getSongById);
 
 // POST /api/songs - Create new song
-router.post('/', createSong);
+router.post('/', validateBody(createSongSchema), createSong);
 
 // PUT /api/songs/:id - Update song
-router.put('/:id', updateSong);
+router.put('/:id', validateBody(updateSongSchema), updateSong);
 
 // DELETE /api/songs/:id - Delete song
 router.delete('/:id', deleteSong);

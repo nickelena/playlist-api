@@ -6,6 +6,8 @@ import {
   updateUser,
   deleteUser,
 } from '../controllers/users.js';
+import { validateBody } from '../middleware/validate.js';
+import { createUserSchema, updateUserSchema } from '../validation/schemas.js';
 
 const router = Router();
 
@@ -16,10 +18,10 @@ router.get('/', getAllUsers);
 router.get('/:id', getUserById);
 
 // POST /api/users - Create new user
-router.post('/', createUser);
+router.post('/', validateBody(createUserSchema), createUser);
 
 // PUT /api/users/:id - Update user
-router.put('/:id', updateUser);
+router.put('/:id', validateBody(updateUserSchema), updateUser);
 
 // DELETE /api/users/:id - Delete user
 router.delete('/:id', deleteUser);

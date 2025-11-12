@@ -6,6 +6,8 @@ import {
   updateArtist,
   deleteArtist,
 } from '../controllers/artists.js';
+import { validateBody } from '../middleware/validate.js';
+import { createArtistSchema, updateArtistSchema } from '../validation/schemas.js';
 
 const router = Router();
 
@@ -16,10 +18,10 @@ router.get('/', getAllArtists);
 router.get('/:id', getArtistById);
 
 // POST /api/artists - Create new artist
-router.post('/', createArtist);
+router.post('/', validateBody(createArtistSchema), createArtist);
 
 // PUT /api/artists/:id - Update artist
-router.put('/:id', updateArtist);
+router.put('/:id', validateBody(updateArtistSchema), updateArtist);
 
 // DELETE /api/artists/:id - Delete artist
 router.delete('/:id', deleteArtist);

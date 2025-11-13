@@ -168,7 +168,7 @@ export function addSongToPlaylist(req: Request, res: Response, next: NextFunctio
       );
       res.status(201).json({ message: 'Song added to playlist', position: finalPosition });
     } catch (error: any) {
-      if (error.code === 'SQLITE_CONSTRAINT') {
+      if (error.code && error.code.startsWith('SQLITE_CONSTRAINT')) {
         throw new ApiError(409, 'Song already in playlist');
       }
       throw error;
